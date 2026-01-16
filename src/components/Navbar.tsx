@@ -10,13 +10,13 @@ export default function Navbar() {
                 </Link>
                 <div className="flex items-center gap-8 font-mono text-sm">
                     <Link href="/blog" className="hover:text-primary transition-colors hover:underline decoration-primary underline-offset-4">
-                        /blog
+                        blog
                     </Link>
                     <Link href="/writeups" className="hover:text-primary transition-colors hover:underline decoration-primary underline-offset-4">
-                        /writeups
+                        writeups
                     </Link>
                     <Link href="/notes" className="hover:text-primary transition-colors hover:underline decoration-primary underline-offset-4">
-                        /notes
+                        notes
                     </Link>
                 </div>
             </div>
