@@ -1,26 +1,142 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #050505;
+  --foreground: #e0e0e0;
+  --primary: #00f3ff;
+  /* Electric Blue */
+  --secondary: #bd00ff;
+  /* Cyber Purple */
+  --accent: #111111;
+  /* Dark Gray for cards */
+  --font-geist-sans: "Arial", sans-serif;
+  /* Fallback until fonts loaded */
+  --font-geist-mono: "Courier New", monospace;
+  /* Fallback */
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Typography / Prose - Minimal implementation since we didn't install @tailwindcss/typography */
+.prose {
+  color: #ccc;
+  line-height: 1.75;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: #fff;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  font-family: var(--font-sans);
+}
+
+.prose h1 {
+  font-size: 2.25em;
+}
+
+.prose h2 {
+  font-size: 1.75em;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.3em;
+}
+
+.prose h3 {
+  font-size: 1.3em;
+  color: var(--primary);
+}
+
+.prose p {
+  margin-bottom: 1.5em;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1.5em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  list-style-type: disc;
+  margin-bottom: 0.5em;
+}
+
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.prose code {
+  background: #111;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: #ff79c6;
+}
+
+.prose pre {
+  background: #0d0d0d;
+  padding: 1.5em;
+  border-radius: 8px;
+  border: 1px solid #333;
+  overflow-x: auto;
+  margin-bottom: 2em;
+}
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.9em;
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--primary);
+  padding-left: 1em;
+  color: #888;
+  font-style: italic;
+}
+
+/* Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px var(--primary);
+  }
 }
