@@ -15,8 +15,8 @@ export default function Navbar() {
                     <Link href="/writeups" className="hover:text-primary transition-colors hover:underline decoration-primary underline-offset-4">
                         writeups
                     </Link>
-                    <Link href="/notes" className="hover:text-primary transition-colors hover:underline decoration-primary underline-offset-4">
-                        notes
+                    <Link href="/whoami" className="hover:text-primary transition-colors hover:underline decoration-primary underline-offset-4">
+                        whoami
                     </Link>
                 </div>
             </div>

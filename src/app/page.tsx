@@ -72,12 +72,11 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 border-t border-gray-800 mt-12"
+          className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-12 border-t border-gray-800 mt-12"
         >
           {[
-            { label: 'Total Writeups', value: '12' },
-            { label: 'CTFs Solved', value: '47' },
-            { label: 'Days Coding', value: '128' },
+            { label: 'Total Writeups', value: '3' },
+            { label: 'CTFs Solved', value: '1' },
             { label: 'Latest Post', value: 'Today' }
           ].map((stat, i) => (
             <div key={stat.label} className="p-4 border border-gray-900 bg-gray-950/50 rounded-sm">
