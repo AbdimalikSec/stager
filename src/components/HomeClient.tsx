@@ -1,103 +1,122 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Terminal } from "lucide-react";
 
 export default function HomeClient({ writeupsCount }: { writeupsCount: number }) {
+    const [step, setStep] = useState(0);
+
+    useEffect(() => {
+        const timings = [300, 900, 1800, 2600, 3400];
+        const timers = timings.map((delay, i) =>
+            setTimeout(() => setStep(i + 1), delay)
+        );
+        return () => timers.forEach(clearTimeout);
+    }, []);
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-100px)] py-12 px-6">
-            <div className="max-w-4xl w-full space-y-8">
-                {/* Terminal Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex items-center gap-2 text-gray-500 font-mono text-sm mb-4"
-                >
-                    <span className="text-primary">root@stager:~#</span>
-                </motion.div>
+        <div className="flex items-center justify-center min-h-[calc(100vh-100px)] px-6">
+            <div className="w-full max-w-4xl font-mono text-base md:text-lg leading-relaxed">
 
-                {/* Hero Content */}
-                <div className="space-y-6">
-                    <motion.h1
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2, duration: 0.5 }}
-                        className="text-5xl md:text-7xl font-bold font-sans tracking-tight"
-                    >
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-600">
-                            I'm Cybersecurity Analyst
-                        </span>
-                        <br />
-                        & <span className="text-white">Internal Penetration Tester</span>.
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.4, duration: 0.5 }}
-                        className="text-xl text-gray-400 max-w-2xl font-mono leading-relaxed"
-                    >
-                        I go by Stager. Here I document my journey through internal penetration testing,
-                        CTF challenges, and analyzing security vulnerabilities.
-                    </motion.p>
+                {/* Initial prompt */}
+                <div className="flex items-center gap-1">
+                    <span className="text-primary">root@stager</span>
+                    <span className="text-gray-600">:</span>
+                    <span className="text-primary">~</span>
+                    <span className="text-gray-600">#</span>
                 </div>
 
-                {/* Buttons */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.5 }}
-                    className="flex flex-wrap gap-4 pt-4"
-                >
-                    <Link
-                        href="/writeups"
-                        className="group flex items-center gap-2 bg-primary text-black px-6 py-3 rounded-sm font-bold font-mono hover:bg-emerald-400 transition-all"
-                    >
-                        <Terminal size={18} />
-                        View Writeups
-                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                    <Link
-                        href="/blog"
-                        className="flex items-center gap-2 border border-gray-700 text-gray-300 px-6 py-3 rounded-sm font-mono hover:border-primary hover:text-primary transition-all bg-black/50"
-                    >
-                        Read Blog
-                    </Link>
-                </motion.div>
+                {/* Block 1 — whoami */}
+                {step >= 1 && (
+                    <div className="mt-3">
+                        <div className="flex items-center gap-1">
+                            <span className="text-primary">root@stager</span>
+                            <span className="text-gray-600">:</span>
+                            <span className="text-primary">~</span>
+                            <span className="text-gray-600">#</span>
+                            <span className="text-white ml-2">whoami</span>
+                        </div>
+                        <p className="text-gray-400 mt-1">stager</p>
+                    </div>
+                )}
 
-                {/* Statistics or Status */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-12 border-t border-gray-800 mt-12"
-                >
-                    {[
-                        { label: 'Total Writeups', value: writeupsCount.toString(), href: '/writeups' },
-                        { label: 'CTFs Solved', value: '1' },
-                        { label: 'Latest Post', value: 'Today' }
-                    ].map((stat, i) => (
-                        stat.href ? (
-                            <Link href={stat.href} key={stat.label} className="block transition-transform hover:scale-105">
-                                <div className="p-4 border border-gray-900 bg-gray-950/50 rounded-sm h-full hover:border-primary transition-colors">
-                                    <div className="text-xs text-gray-500 font-mono uppercase mb-1">{stat.label}</div>
-                                    <div className="text-primary font-mono font-bold">
-                                        {stat.value}
-                                    </div>
-                                </div>
+                {/* Block 2 — about */}
+                {step >= 2 && (
+                    <div className="mt-4">
+                        <div className="flex items-center gap-1">
+                            <span className="text-primary">root@stager</span>
+                            <span className="text-gray-600">:</span>
+                            <span className="text-primary">~</span>
+                            <span className="text-gray-600">#</span>
+                            <span className="text-white ml-2">cat about.txt</span>
+                        </div>
+                        <div className="text-gray-400 mt-1 space-y-0.5">
+                            <p><span className="font-bold text-gray-200">Penetration tester.</span> Security engineer.</p>
+                            <p>Founder of <span className="font-bold text-primary">FashilHack</span> — offensive security for businesses.</p>
+                            <p>I <span className="font-bold text-gray-200">break internal networks</span> and document exactly how.</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Block 3 — ls work */}
+                {step >= 3 && (
+                    <div className="mt-4">
+                        <div className="flex items-center gap-1">
+                            <span className="text-primary">root@stager</span>
+                            <span className="text-gray-600">:</span>
+                            <span className="text-primary">~</span>
+                            <span className="text-gray-600">#</span>
+                            <span className="text-white ml-2">ls ./work</span>
+                        </div>
+                        <div className="flex items-center gap-6 mt-1">
+                            <Link href="/writeups" className="text-primary hover:text-emerald-400 transition-colors">
+                                writeups/
                             </Link>
-                        ) : (
-                            <div key={stat.label} className="p-4 border border-gray-900 bg-gray-950/50 rounded-sm">
-                                <div className="text-xs text-gray-500 font-mono uppercase mb-1">{stat.label}</div>
-                                <div className="text-primary font-mono font-bold">
-                                    {stat.value}
-                                </div>
-                            </div>
-                        )
-                    ))}
-                </motion.div>
+                            <Link href="/blog" className="text-primary hover:text-emerald-400 transition-colors">
+                                blog/
+                            </Link>
+                            {/*
+<a
+    href="https://fashilhack.so"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-primary hover:text-emerald-400 transition-colors"
+>
+    engagements/
+</a>
+*/}
+                        </div>
+                    </div>
+                )}
+
+                {/* Block 4 — stats */}
+                {step >= 4 && (
+                    <div className="mt-4">
+                        <div className="flex items-center gap-1">
+                            <span className="text-primary">root@stager</span>
+                            <span className="text-gray-600">:</span>
+                            <span className="text-primary">~</span>
+                            <span className="text-gray-600">#</span>
+                            <span className="text-white ml-2">cat stats.txt</span>
+                        </div>
+                        <div className="flex items-center gap-8 mt-1 text-gray-500 text-sm md:text-base">
+                            <span>writeups <span className="text-primary">{writeupsCount}</span></span>
+                            <span>ctfs solved <span className="text-primary">1</span></span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Blinking cursor */}
+                {step >= 5 && (
+                    <div className="mt-4 flex items-center gap-1">
+                        <span className="text-primary">root@stager</span>
+                        <span className="text-gray-600">:</span>
+                        <span className="text-primary">~</span>
+                        <span className="text-gray-600">#</span>
+                        <span className="ml-2 text-primary animate-pulse">█</span>
+                    </div>
+                )}
+
             </div>
         </div>
     );
