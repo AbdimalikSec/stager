@@ -2,7 +2,20 @@ import { getPostBySlug, getPosts } from "@/lib/posts";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
+
+const components = {
+    img: (props: any) => (
+        <Image
+            {...props}
+            width={800}
+            height={500}
+            style={{ width: "100%", height: "auto", borderRadius: "6px", margin: "1.5rem 0" }}
+            alt={props.alt || ""}
+        />
+    ),
+};
 
 export async function generateStaticParams() {
     const posts = getPosts("blog");
@@ -46,7 +59,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
             </header>
 
             <article className="prose prose-invert prose-green max-w-none font-sans">
-                <MDXRemote source={post.content} />
+                <MDXRemote source={post.content} components={components} />
             </article>
         </div>
     );
