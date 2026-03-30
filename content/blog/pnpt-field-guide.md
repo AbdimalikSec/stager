@@ -7,23 +7,25 @@ tags: ["pnpt", "penetration-testing", "active-directory", "red-team", "certifica
 
 ## Before Anything Else — What the PNPT Actually Is
 
+The PNPT is a practical exam by TCM Security. Five days to compromise a network, two days to write a professional report, then a 15-minute live debrief where you explain your findings to an examiner. No multiple choice, no browser-based VM, no flag submission. You work on your own machine, against a real simulated environment, and you document everything the way you would on an actual engagement.
+
+That's the part that sold me. Most certs test whether you memorized something. This one tests whether you can actually do the job.
+
+To pass you need to run OSINT, compromise an external machine, pivot into the internal network, work through Active Directory, reach Domain Admin, and then write a report that a client could actually read and act on. The technical skill matters. The reporting matters. The ability to explain what you did in plain language to a non-technical stakeholder matters. All three get tested.
+
+I came into this after building real lab environments, completing the TCM course material across Practical Ethical Hacking, OSINT, and the External Pentest Playbook, and grinding HTB and THM machines until the methodology started feeling automatic. I'm not doing this to collect a cert. I'm doing it because I want to know I can run a real internal network pentest from start to report.
+What follows is every tool, command, and decision point I work through across the full exam flow — written the way I wish someone had written it before I started.
+
+
 The exam costs $399 and that includes the study material. You get 5 days to compromise the domain and 2 days to write the report. Seven days total.
 
-What makes it different from most certs is that you work on your own machine. No browser-based VM, no lag, no fighting someone else's interface. You connect via `.ovpn`, your Kali gets a route to the exam network, and then you just work. I've done exams where the platform was the hardest part. This isn't that.
-
-To pass, you need to run OSINT, external pentesting, and internal pentesting — in that order. It's not CTF-style. There's no binary flag you paste somewhere. You compromise a domain the way you'd compromise one in a real engagement, then write a report explaining what you did and what it means.
 
 The exam tests your hacker mindset as much as your technical skill. Reconnaissance is the key. Every time I've gotten stuck during practice, it was because I rushed past something in the enumeration phase. The answer was always there — I just didn't look long enough.
 
-One honest drawback: seven days is a lot of time, and that makes you lazy. You'll think "I'll do more tomorrow" on day two, and day four arrives faster than expected. Treat the first two days seriously.
-
-Is it easy? It depends on your skill level and how your hacker brain works. If you're just starting, do EJPTv2 or PJPT first, then come back. If you're already comfortable with basic cybersecurity concepts and AD, the TCM material is more than enough to pass.
 
 The debriefing stage — where you explain how you compromised the domain after submitting the report — is straightforward if you did the work. Talk through what you found, what you exploited, and how. Anyone who completed both the exam and the report can handle it.
 
 Would I recommend it? If you want to prove you can actually pentest — yes. If getting hired is the only goal and you can afford OSCP, that cert opens more doors. If you can't afford OSCP yet, PNPT is a legitimate alternative and the skills you build for it are real.
-
-The `.ovpn` file TCM gives you is just the VPN. Not a finding, not part of the attack. Plug it in, your Kali gets a route to the exam network, and you start working.
 
 ## How the Whole Thing Flows
 
