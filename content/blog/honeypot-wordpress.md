@@ -13,7 +13,6 @@ The goal was to understand what this infrastructure actually looks like from the
 
 Everything here was done in a controlled lab environment on infrastructure I own.
 
----
 
 ## Lab Environment
 
@@ -27,7 +26,6 @@ Everything here was done in a controlled lab environment on infrastructure I own
 | Backend | PHP |
 | Email (optional) | Zoho |
 
----
 
 ## Architecture Overview
 
@@ -51,7 +49,6 @@ Redirects victim to real WordPress login
 
 The redirect at the end is the part most people miss. Sending someone to the real WordPress login after capturing their input means they assume they mistyped their password and just log in normally. Nothing looks wrong from their side.
 
----
 
 ## Step 1 — VPS and Domain Setup
 
@@ -63,7 +60,6 @@ Bought a domain and pointed it to the VPS.
 
 ![Domain registration](/blog/honeypot/domain.png)
 
----
 
 ## Step 2 — DNS in Cloudflare
 
@@ -73,7 +69,6 @@ Created an A record in Cloudflare pointing the domain to the VPS IP. This routes
 
 One important note: Cloudflare proxy (the orange cloud) needs to be **off** — DNS only. When proxy is on, Cloudflare terminates the TLS connection itself, which conflicts with the certificate we're installing directly on Apache.
 
----
 
 ## Step 3 — Free SSL Certificate with ZeroSSL
 
@@ -85,7 +80,6 @@ ZeroSSL issues free 90-day certificates. After verifying domain ownership, you d
 
 Upload these to the VPS. I stored them under `/root/ssl/`.
 
----
 
 ## Step 4 — Installing Apache and PHP
 
@@ -101,7 +95,6 @@ cd /var/www/html
 sudo rm index.html
 ```
 
----
 
 ## Step 5 — Configuring Apache for HTTPS
 
@@ -143,7 +136,6 @@ sudo systemctl restart apache2
 
 If `configtest` returns `Syntax OK` you're good. Visit your domain — the padlock should appear. No "not secure" warning.
 
----
 
 ## Step 6 — The Fake WordPress Login Page
 
@@ -191,7 +183,6 @@ Replace `index.html` with a WordPress-styled login page. The visual design matte
 
 ![WordPress honeypot login page](/blog/honeypot/phishing-wordpress.png)
 
----
 
 ## Step 7 — The PHP Credential Logger
 
@@ -220,7 +211,6 @@ sudo chown www-data:www-data /var/www/html/creds.txt
 sudo chmod 666 /var/www/html/creds.txt
 ```
 
----
 
 ## Step 8 — Testing
 
@@ -242,7 +232,6 @@ Output:
 
 It works. The submission is logged, the user is redirected, and nothing on the page indicates anything went wrong.
 
----
 
 ## What a Defender Would See
 
@@ -254,7 +243,6 @@ It works. The submission is logged, the user is redirected, and nothing on the p
 
 **The redirect** — behavioral analytics on the identity provider side would flag a login from a new IP or device immediately after the credential submission, even if the victim successfully logs into the real site afterward.
 
----
 
 ## What I Took From This
 

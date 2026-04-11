@@ -3,6 +3,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Tag, Terminal } from "lucide-react";
+import MDXCodeBlock from "@/components/MDXCodeBlock";
 
 export async function generateStaticParams() {
     const posts = getPosts("writeups");
@@ -49,7 +50,7 @@ export default async function WriteupPost({ params }: { params: { slug: string }
             </div>
 
             <article className="prose prose-invert prose-purple max-w-none font-sans">
-                <MDXRemote source={post.content} />
+                <MDXRemote source={post.content} components={{ pre: MDXCodeBlock }} />
             </article>
         </div>
     );

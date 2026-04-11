@@ -11,7 +11,6 @@ Every pentest, every CTF, every real engagement happens on Linux or against syst
 
 These notes come from real practice — OverTheWire wargames, lab work, and building tools from scratch. Not theory. Things I actually typed and used.
 
----
 
 ## The Linux Filesystem — What Lives Where
 
@@ -32,7 +31,6 @@ Before you touch a single command, understand where things are. Linux isn't rand
 
 The ones you'll use most during a pentest: `/etc`, `/var`, `/tmp`, `/dev`, `/proc`.
 
----
 
 ## Reading a File Listing
 
@@ -56,7 +54,6 @@ So `-rw-r--r--` means:
 - Group: read only
 - Everyone: read only
 
----
 
 ## Essential Commands You'll Use Every Day
 
@@ -121,7 +118,6 @@ tar -xf archive.tar                        # extract silently
 gzip archive.tar                           # compress the archive
 ```
 
----
 
 ## Shell Basics
 
@@ -138,7 +134,6 @@ result=$(whoami)
 echo $result
 ```
 
----
 
 ## Locating Binaries
 
@@ -149,7 +144,6 @@ which nmap      # shows which nmap runs when you type it (based on PATH)
 
 `which` tells you what actually runs. `whereis` tells you everywhere it exists.
 
----
 
 ## System Information
 
@@ -165,7 +159,6 @@ cal             # calendar
 date            # current date and time
 ```
 
----
 
 ## Shredding a File
 
@@ -177,7 +170,6 @@ shred filename
 
 Standard `rm` just removes the pointer to the file. The data stays on disk until overwritten. `shred` overwrites the data multiple times first.
 
----
 
 ## Symbolic Links
 
@@ -189,7 +181,6 @@ ln -s filename linkname
 
 The link appears in `ls -la` with `l` at the start and shows where it points with `->`.
 
----
 
 ## Removing Files and Directories
 
@@ -200,7 +191,6 @@ rm -r foldername        # delete a folder and everything in it
 
 Non-empty directories need `-r`. No recycle bin on Linux — it's gone.
 
----
 
 ## What's Next
 

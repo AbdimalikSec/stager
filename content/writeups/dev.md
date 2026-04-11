@@ -7,14 +7,12 @@ tags: ["linux", "tcm-security", "peh", "writeup", "nfs", "cms", "gtfobins"]
 
 **By Stager** | FashilHack
 
----
 ## What this machine taught me
 
 Dev is the kind of machine that makes you appreciate enumeration. Every service gave you one piece of the puzzle. The NFS share gave you a key. The config file gave you a password. The web app gave you the username. None of them alone were enough — you had to put them all together.
 
 I'll be honest: I got stuck on the username. I found `jp` in the todo.txt, tried it, tried `bolt`, tried `root` — none worked. The full username `jeanpaul` was sitting in `/etc/passwd` the whole time, accessible via a file inclusion vulnerability in Boltwire on port 8080. I found that through the writeup after spending time on it. I'm documenting it here because that's the step worth learning.
 
----
 
 ## Target
 
@@ -23,7 +21,6 @@ IP:  172.20.10.5
 OS:  Debian Linux
 ```
 
----
 
 ## Step 1 — Nmap
 
@@ -43,7 +40,6 @@ Three things worth attacking: port 80 web app, port 8080 web app, and NFS on 204
 
 ![Nmap Results](/writeups/dev/nmap.png)
 
----
 
 ## Step 2 — Gobuster on Both Ports
 
@@ -58,7 +54,6 @@ Port 8080 gave me `/dev` — Boltwire CMS running inside.
 ![Gobuster Results](/writeups/dev/dirbuster.png)
 
 
----
 
 ## Step 3 — config.yml — Credentials in the Open
 
@@ -81,7 +76,6 @@ Credentials noted. `I_love_java` went straight into my notes as a password to tr
 
 ![Found database creds](/writeups/dev/found%20database%20creds.png)
 
----
 
 ## Step 4 — NFS Enumeration
 
@@ -111,7 +105,6 @@ One file: a password-protected zip.
 ![NFS share mounted](/writeups/dev/nfs%20shared%20found%20mounted.png)
 
 
----
 
 ## Step 5 — Cracking save.zip
 
@@ -130,7 +123,6 @@ PASSWORD FOUND!!!!: pw == java101
 ![Cracked zip file](/writeups/dev/crack%20a%20zip%20file%20after%20we%20found%20i%20in%20rpcclient%20port%20111.png)
 
 
----
 
 ## Step 6 — What Was Inside the Zip
 
@@ -152,7 +144,6 @@ cat id_rsa
 Two useful things: an SSH private key and a note signed by `jp`. I assumed `jp` was the username. That assumption was wrong — or rather, incomplete.
 ![RSA found](/writeups/dev/rsa%20found.png)
 
----
 
 ## Step 7 — Where I Got Stuck (And What the Answer Was)
 
@@ -181,7 +172,6 @@ jeanpaul:x:1000:1000:,,,:/home/jeanpaul:/bin/bash
 
 **What I should have done:** After finding Boltwire in the `/dev` directory, I should have searched for known vulnerabilities immediately. File inclusion in Boltwire is documented and well known. It would have saved significant time.
 
----
 
 ## Step 8 — SSH as jeanpaul
 
@@ -192,7 +182,6 @@ ssh -i id_rsa jeanpaul@172.20.10.5
 
 Worked. The passphrase for the key was the same password found in `config.yml`. Password reuse — the todo.txt even said "Keep coding in Java" which pointed directly at it.
 
----
 
 ## Step 9 — Root via sudo zip
 
@@ -220,7 +209,6 @@ cat flag.txt
 
 Done.
 
----
 ## The Full Chain
 
 ```
@@ -243,7 +231,6 @@ sudo -l → sudo zip → GTFOBins → root
 /root/flag.txt
 ```
 
----
 
 ## What I took from this
 
@@ -255,6 +242,5 @@ sudo -l → sudo zip → GTFOBins → root
 
 **`sudo -l` before anything else on privesc.** It's one command and it tells you everything that user can run as root. `sudo zip` looks harmless. GTFOBins shows it's not.
 
----
 
 _Stager — FashilHack — Simulating Attacks, Securing Businesses._

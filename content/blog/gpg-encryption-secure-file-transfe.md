@@ -11,7 +11,6 @@ If you want to send a file to someone and guarantee that nobody else can read it
 
 This is a walkthrough of a lab I ran with two Kali machines simulating a sender and receiver on different networks. I'll cover the full GPG flow, and also a real SSH error I hit during the SCP transfer that took me a minute to diagnose and fix.
 
----
 
 ## Lab Setup
 
@@ -21,7 +20,6 @@ This is a walkthrough of a lab I ran with two Kali machines simulating a sender 
 
 The two machines are not on the same LAN. File transfer goes over SCP.
 
----
 
 ## How GPG Works (The Short Version)
 
@@ -32,7 +30,6 @@ GPG uses asymmetric encryption — two mathematically linked keys:
 
 The important thing: encrypting with someone's public key means only their private key can decrypt it. Even if the encrypted file is intercepted in transit, it's useless without the private key.
 
----
 
 ## Step 1 — Receiver Generates a Key Pair
 
@@ -50,7 +47,6 @@ Once done, verify the key exists:
 gpg --list-keys
 ```
 
----
 
 ## Step 2 — Export the Public Key
 
@@ -62,7 +58,6 @@ gpg --armor --export friend@example.com > publickey.asc
 
 `--armor` outputs it as ASCII text instead of binary. This makes it safe to email, paste into a chat, or upload anywhere. Public keys are meant to be shared openly — you can post them on GitHub, your website, anywhere.
 
----
 
 ## Step 3 — Transfer the Public Key to the Sender
 
@@ -114,7 +109,6 @@ Works. The file transfers cleanly.
 
 I went with Fix 2. Renaming keeps the original file intact if you ever need it back, but stops SSH from loading the broken algorithms on every connection.
 
----
 
 ## Step 4 — Sender Imports the Public Key
 
@@ -132,7 +126,6 @@ gpg --list-keys
 
 You should see the receiver's key in the keyring. Your machine now knows how to encrypt something only they can read.
 
----
 
 ## Step 5 — Sender Encrypts a File
 
@@ -160,7 +153,6 @@ hQIMA7X3k9vGqzl...
 
 That file is useless to anyone without the receiver's private key. You can email it, upload it, post it publicly — it doesn't matter. Nobody can read it.
 
----
 
 ## Step 6 — Send the Encrypted File Back
 
@@ -172,7 +164,6 @@ scp secret.txt.asc kali@172.20.10.5:~
 
 No errors this time — the config fix from Step 3 is still in place.
 
----
 
 ## Step 7 — Receiver Decrypts It
 
@@ -190,7 +181,6 @@ gpg: Signature made...
 gpg: Good signature from "friend@example.com"
 ```
 
----
 
 ## Optional: Sign Your Message Too
 
@@ -210,7 +200,6 @@ gpg --verify secret.txt.asc
 
 If the signature is valid, they know it came from your key and wasn't tampered with in transit.
 
----
 
 ## Why This Matters Beyond the Lab
 
@@ -218,7 +207,6 @@ This is the same mechanism journalists use to receive documents from whistleblow
 
 For red team work: GPG is how you'd securely exfiltrate sensitive findings during an engagement without exposing them in transit. For blue team: understanding this tells you exactly why encrypted exfiltration is hard to detect at the network layer — the content is opaque, you can only see that an encrypted transfer happened.
 
----
 
 ## Quick Reference
 

@@ -7,7 +7,6 @@ tags: ["linux", "tcm-security", "peh", "writeup", "virtual-host", "dns"]
 
 **By Stager**  | FashilHack
 
----
 ## What this machine is about
 
 Blackpearl teaches one thing specifically: Virtual Host Routing. The flag literally tells you this at the end. A single IP, multiple sites, and the only way to reach the right one is knowing the domain name. If you enumerate properly you find it. If you don't — you're stuck looking at an nginx default page the entire time wondering what you're missing.
@@ -20,7 +19,6 @@ Domain: blackpearl.tcm (discovered during recon)
 OS:     Debian Linux
 ```
 
----
 
 ## Step 1 — Nmap
 
@@ -49,7 +47,6 @@ gobuster dir -u http://172.20.10.4 -w big.txt -x php,html,txt
 Found `/secret` (200) — nothing else useful on the IP. That told don't focus on fuzzing look anywhere else.
 
 
----
 
 ## Step 2 — Source Code
 
@@ -64,7 +61,6 @@ Line 25:
 There it is. Domain: `blackpearl.tcm`. Username: `alek`. Both noted.
 ![Found user in sourcecode](/writeups/blackpearl/found%20user%20in%20sourcecode.png)
 
----
 
 ## Step 3 — DNS Enumeration
 
@@ -96,7 +92,6 @@ sudo nano /etc/hosts
 **Why this matters:** Without this line, my browser and tools send requests with `Host: 172.20.10.4` — nginx returns the default page. With this line, they send `Host: blackpearl.tcm` — nginx routes to the real application. That's virtual host routing in one sentence.
 ![Added DNS locally](/writeups/blackpearl/checked%20dns%20ip%20to%20domain%20blackpearl.tcm%20in%20hosts.png)
 
----
 
 ## Step 4 — Gobuster on the Domain
 
@@ -109,7 +104,6 @@ gobuster dir -u http://blackpearl.tcm/ -w big.txt -x php,html,txt
 Found `/navigate` (301). The same tool, the same IP, completely different results — because now the Host header is right.
 ![Dirbuster on virtual host](/writeups/blackpearl/did%20disbuster%20to%20new%20domain%20found%20navigate.png)
 
----
 
 ## Step 5 — Navigate CMS
 
@@ -118,7 +112,6 @@ Went to `http://blackpearl.tcm/navigate/login.php` — Navigate CMS login page. 
 Searched for exploits: **Navigate CMS 2.8 Unauthenticated RCE** — Metasploit module available. No credentials needed.
 ![Navigate CMS login](/writeups/blackpearl/found%20login.png)
 
----
 
 ## Step 6 — Metasploit — Navigate CMS RCE
 
@@ -151,7 +144,6 @@ whoami
 Low-privilege shell. The `vhost` option is easy to forget — if you skip it, the exploit hits the nginx default page and fails. Always set it when the target runs virtual hosts.
 ![Got a shell via Navigate CMS explit](/writeups/blackpearl/got%20a%20shell%20after%20exploit%20navigate%20cms%20and%20bypass%20authenticaion.png)
 
----
 
 ## Step 7 — Linpeas
 
@@ -177,7 +169,6 @@ SUID section — one line in red:
 php7.3 owned by root with the SUID bit. That means any user who runs it gets root's effective UID. GTFOBins has the exact command.
 ![Linpeas execution](/writeups/blackpearl/runned%20linpeas.png)
 
----
 
 ## Step 8 — SUID → Root
 
@@ -212,7 +203,6 @@ Done.
 
 ![Escalated to root using SUID](/writeups/blackpearl/esclated%20to%20root%20by%20running%20a%20root%20file%20us%20low%20user.png)
 
----
 
 ## The Full Chain
 
@@ -236,7 +226,6 @@ pcntl_exec('/bin/sh', ['-p']) → euid=0(root)
 /root/flag.txt
 ```
 
----
 
 ## What I took from this
 
@@ -248,6 +237,5 @@ pcntl_exec('/bin/sh', ['-p']) → euid=0(root)
 
 **The `-p` flag on SUID shells.** Small detail, big difference. Without it you drop privileges. With it you keep euid=0. GTFOBins always shows the right flags — read it carefully, don't just copy the first command you see.
 
----
 
 _Stager — PNPT Candidate_ _FashilHack — Simulating Attacks, Securing Businesses._

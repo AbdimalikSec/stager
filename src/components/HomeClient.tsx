@@ -100,8 +100,8 @@ export default function HomeClient({ writeupsCount }: { writeupsCount: number })
                             <span className="text-white ml-2">cat stats.txt</span>
                         </div>
                         <div className="flex items-center gap-8 mt-1 text-gray-500 text-sm md:text-base">
+                            <span>boxes rooted <span className="text-primary">{writeupsCount}+</span></span>
                             <span>writeups <span className="text-primary">{writeupsCount}</span></span>
-                            <span>ctfs solved <span className="text-primary">1</span></span>
                         </div>
                     </div>
                 )}

@@ -9,7 +9,6 @@ tags: ["linux", "networking", "enumeration", "nmap", "recon"]
 
 Whether you're doing recon on an external target or enumerating an internal network after getting a shell, these are the commands you'll reach for every time. Know them well enough that you don't have to think about the syntax.
 
----
 
 ## Finding Your Own IP Address
 
@@ -24,7 +23,6 @@ ip address | grep eth0 | grep inet | awk '{print $2}'
 
 The `awk '{print $2}'` at the end pulls just the IP/CIDR from the output instead of the full line.
 
----
 
 ## Interface Information
 
@@ -38,7 +36,6 @@ During a pentest, running `ip a` or `ifconfig` on a compromised machine immediat
 - Whether it has multiple interfaces (pivoting opportunity)
 - The MAC address (useful for spoofing or identification)
 
----
 
 ## Checking Open Ports on Your Own Machine
 
@@ -53,7 +50,6 @@ sudo ss -tuln | grep :22        # check if a specific port is open (22 = SSH)
 
 `netstat -a | less` shows all connections including established ones — useful for seeing what's currently talking to what.
 
----
 
 ## Checking Services
 
@@ -64,7 +60,6 @@ sudo systemctl restart ssh                      # restart a service
 systemctl list-units --type=service | grep ssh  # find a service by name
 ```
 
----
 
 ## DNS
 
@@ -73,7 +68,6 @@ cat /etc/resolv.conf        # your configured DNS servers (old way)
 resolvectl status           # better — shows DNS servers per interface
 ```
 
----
 
 ## Connectivity Testing
 
@@ -84,7 +78,6 @@ traceroute google.com           # show every hop between you and the target
 
 `traceroute` is useful for understanding network topology — which routers sit between you and a target, where traffic is being filtered, and approximate network distances.
 
----
 
 ## Firewall — UFW
 
@@ -102,7 +95,6 @@ sudo iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 
 During a lab when you need to receive reverse shells or serve files, you'll often need to temporarily allow a port. `ufw allow [port]` is the quick way.
 
----
 
 ## Nmap — Network Scanning
 
@@ -119,7 +111,6 @@ Flag breakdown:
 - `-Pn` — skip host discovery (treat host as up even if ping is blocked)
 - `-n` — no DNS resolution (faster)
 
----
 
 ## Subdomain Enumeration
 
@@ -129,7 +120,6 @@ sublist3r -d hormuud.com        # find subdomains of a target domain
 
 Sublist3r queries multiple sources — search engines, certificate transparency logs, DNS brute force — and aggregates results. Useful for external recon before touching the target.
 
----
 
 ## Website Availability
 
@@ -140,7 +130,6 @@ wget https://example.com/file.pdf   # download a file from a URL
 curl https://example.com > page.html # download and save a URL
 ```
 
----
 
 ## Netstat Reference
 
@@ -157,7 +146,6 @@ netstat -tulpn          # listening ports with process info
 
 During post-exploitation on a Windows or Linux machine, `netstat -tulpn` immediately tells you what services are listening locally — which is how you find things like MySQL on `127.0.0.1:3306` or internal web apps on non-standard ports that aren't visible from outside.
 
----
 
 ## Checking Processes and Connections Together
 
@@ -169,7 +157,6 @@ htop                            # better looking live process viewer
 sudo apt install htop           # install it if not present
 ```
 
----
 
 ## What's Next
 

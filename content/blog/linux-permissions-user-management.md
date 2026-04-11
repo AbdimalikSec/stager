@@ -9,7 +9,6 @@ tags: ["linux", "permissions", "privilege-escalation", "red-team"]
 
 Permissions are not just a sysadmin topic. Every privilege escalation technique on Linux starts with understanding what you can and can't access, what runs as root, and where the misconfigurations are. This is the bridge between basic Linux and offensive security.
 
----
 
 ## Reading Permissions
 
@@ -32,7 +31,6 @@ Break down `-rw-r--r--`:
 
 `r` = read, `w` = write, `x` = execute, `-` = permission not set.
 
----
 
 ## chmod — Changing Permissions
 
@@ -80,7 +78,6 @@ chmod u-r textsfolder   # owner can enter the folder but can't see contents with
 
 Removing read from a directory means `ls` inside it fails — the user can `cd` in but can't list what's there.
 
----
 
 ## Ownership — chown and chgrp
 
@@ -97,7 +94,6 @@ sudo chown kali:kali file.txt       # set owner and group at once
 sudo chgrp security persons         # give security group ownership of 'persons' file
 ```
 
----
 
 ## User Management
 
@@ -114,7 +110,6 @@ finger cabdi                    # inspect user cabdi
 whatis finger                   # quick description of a command
 ```
 
----
 
 ## Group Management
 
@@ -127,7 +122,6 @@ sudo gpasswd -a saacid group    # add saacid to group
 sudo gpasswd -d saacid group    # remove saacid from group
 ```
 
----
 
 ## SUID Bit — Where Permissions Become a Pentest Vector
 
@@ -187,7 +181,6 @@ Output:
 
 The `s` confirms SUID is set. Anyone running this binary gets root-level execution for that process. If an attacker gains control of an application that has SUID set and accesses `/etc/shadow` (the password file), they have access to hashed passwords for every user on the system.
 
----
 
 ## Disk Space by Directory
 
@@ -196,7 +189,6 @@ df -h           # overall disk usage
 du -sh folder/  # disk space used by a specific folder
 ```
 
----
 
 ## What's Next
 

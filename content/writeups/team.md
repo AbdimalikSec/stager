@@ -1,5 +1,5 @@
 ---
-title: "Team"
+title: "THM: Team Walkthrough"
 date: "2026-04-09"
 description: "Team is an easy Linux box on TryHackMe. It teaches LFI, SSH key abuse, sudo script exploitation, and cronjob hijacking."
 tags: ["linux", "tryhackme", "writeup", "lfi", "cronjob", "privilege-escalation"]
@@ -14,7 +14,6 @@ Team is an easy Linux box on TryHackMe. It's a good one for understanding how sm
 
 The box teaches LFI, SSH key abuse, sudo script exploitation, and cronjob hijacking. Every step feeds into the next. By the end it all makes sense.
 
----
 
 ## Target
 
@@ -42,7 +41,6 @@ Anonymous FTP wasn't allowed this time. Started with the web server.
 
 ![Nmap Results](/writeups/Team/nmap.png)
 
----
 
 ## Step 2 — Web Enumeration
 
@@ -68,7 +66,6 @@ So there's an older version. Browsed to `script.txt.old` and got the FTP credent
 
 ![script.txt.old with credentials](/writeups/Team/user%20and%20pass%20found.png)
 
----
 
 ## Step 3 — FTP Access
 
@@ -91,7 +88,6 @@ Added the subdomain to `/etc/hosts` and moved on.
 
 ![FTP note](/writeups/Team/file%20found.png)
 
----
 
 ## Step 4 — LFI on dev.team.thm
 
@@ -111,7 +107,6 @@ Full `/etc/passwd` came back. LFI confirmed. Users `dale` and `gyles` were both 
 
 ![LFI confirmed](/writeups/Team/dumped%20passwd%20with%20local%20file%20inclustion.png)
 
----
 
 ## Step 5 — Burp Suite Intruder to Find the SSH Key
 
@@ -142,7 +137,6 @@ chmod 600 id_rsa
 ```
 
 ![Burp Intruder LFI fuzzing](/writeups/Team/rsa%20found%20in%20running%20burp.png) 
----
 
 ## Step 6 — SSH as Dale
 
@@ -158,7 +152,6 @@ cat /home/dale/user.txt
 
 ![SSH as dale](/writeups/Team/login%20as%20dale%20with%20rsa.png)
 
----
 
 ## Step 7 — Moving to Gyles
 
@@ -196,7 +189,6 @@ gyles@TEAM:~$
 
 ![Gyles shell](/writeups/Team/script%20found%20in%20gyles%20home.png)
 
----
 
 ## Step 8 — pspy64s to Find Root Cronjobs
 
@@ -232,7 +224,6 @@ Admin group had write access. Gyles was in the admin group. Root runs it every m
 
 ![pspy64s output](/writeups/Team/found%20scripts%20runnig%20as%20root.png)
 
----
 
 ## Step 9 — Root via Cronjob Injection
 
@@ -263,7 +254,6 @@ Done.
 
 ![Root shell](/writeups/Team/root.txt.png)
 
----
 
 ## The Full Chain
 
@@ -287,7 +277,6 @@ gyles in admin group → writable → reverse shell appended → root
 root.txt
 ```
 
----
 
 ## What I learned from this one
 
@@ -303,6 +292,5 @@ root.txt
 
 **Writable script + root cronjob = root.** One appended line was all it took. You don't need to overwrite the whole file — just add to the end and wait.
 
----
 
 _Stager — FashilHack — Simulating Attacks, Securing Businesses._

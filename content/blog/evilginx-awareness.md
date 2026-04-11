@@ -11,7 +11,6 @@ This is a documentation of a lab project I built to understand how modern phishi
 
 Evilginx is a man-in-the-middle phishing framework. Unlike traditional phishing that just clones a login page, Evilginx acts as a reverse proxy — it sits between the victim and the real website, relays everything in real time, and captures session cookies along with credentials. That means it bypasses MFA. That's what makes it worth understanding from both a red team and a blue team perspective.
 
----
 
 ## Lab Environment
 
@@ -24,7 +23,6 @@ Evilginx is a man-in-the-middle phishing framework. Unlike traditional phishing 
 | Framework | Evilginx 3.3.0 Community Edition |
 | Phishlet | LinkedIn |
 
----
 
 ## Setup Walkthrough
 
@@ -155,7 +153,6 @@ And Evilginx captured them:
 
 ![Captured credentials in Evilginx console](/blog/evilginx/getting-victim-creds.png)
 
----
 
 ## What a Defender Would See
 
@@ -169,7 +166,6 @@ From the blue team side, this attack produces several detectable signals:
 
 **Behavioral** — the MFA bypass via session cookie theft is harder to detect at the network layer but shows up as an impossible travel or new device login event in the identity provider logs.
 
----
 
 ## What I Took From This
 

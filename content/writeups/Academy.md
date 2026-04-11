@@ -7,7 +7,6 @@ tags: ["linux", "tcm-security", "peh", "writeup", "cronjob", "privilege-escalati
 
 **By Stager** | FashilHack
 
----
 
 ## What is this machine
 
@@ -234,6 +233,5 @@ backup.sh writable + cron as root → replace with reverse shell → root
 
 **The note gave you the ending before you started.** "He reuses the same password everywhere." That's a breadcrumb the developer left in the scenario, but in real life people write this kind of thing in Slack, internal wikis, sticky notes. Pay attention to what you read.
 
----
 
 _Stager — FashilHack — Simulating Attacks, Securing Businesses._

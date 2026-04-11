@@ -9,7 +9,6 @@ tags: ["linux", "red-team", "covering-tracks", "privilege-escalation", "anonymit
 
 This is the fourth post in the Linux series. By now you know the filesystem, permissions, and networking. This one covers the techniques that are specific to offensive security work — things you'd use during or after an engagement that you won't find in a standard Linux tutorial.
 
----
 
 ## Covering Tracks — Command History
 
@@ -61,7 +60,6 @@ Or clear the file without deleting it:
 cat /dev/null > ~/.bash_history
 ```
 
----
 
 ## Changing Your Terminal Prompt
 
@@ -74,7 +72,6 @@ export PS1='attacker# '  # label it clearly during an engagement
 
 This only lasts the session. Add it to `~/.bashrc` to make it permanent.
 
----
 
 ## Killing Processes
 
@@ -96,7 +93,6 @@ pkill -f script.sh              # kill by matching against full command line
 
 `pkill -f` is useful when a process has a long command line — you can match any part of it.
 
----
 
 ## The DD Command — Physical Drive Copies
 
@@ -128,7 +124,6 @@ Just swap `if` and `of`.
 
 **Blue team / forensics:** Investigators use `dd` to make forensic copies before touching anything on a compromised machine. Working on the copy preserves the original evidence. Deleted files that haven't been overwritten are still recoverable from the image.
 
----
 
 ## Anonymity — AnonSurf and Tor
 
@@ -150,7 +145,6 @@ sudo anonsurf start && sudo watch -n 10 gnome-terminal -- bash -c "sudo anonsurf
 
 **Important:** Tor adds significant latency. Running `nmap` through Tor is impractical — scans become extremely slow. This is useful for browsing and manual testing, not automated scanning.
 
----
 
 ## Python Virtual Environments
 
@@ -165,7 +159,6 @@ deactivate                      # exit the virtual environment
 
 After activating, everything you install with `pip` stays inside the `venv` folder and doesn't touch the system Python. Useful when building custom tools for an engagement.
 
----
 
 ## Running Vulnerable Apps in Docker
 
@@ -181,7 +174,6 @@ docker run --rm -p 127.0.0.1:3000:3000 bkimminich/juice-shop
 
 Both give you intentionally vulnerable web applications to practice against locally without touching anything real.
 
----
 
 ## Quick Reference — Red Team Commands
 

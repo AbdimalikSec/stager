@@ -7,7 +7,6 @@ tags: ["linux", "hackthebox", "writeup", "privilege-escalation"]
 
 **By Stager** | FashilHack
 
----
 
 ## What is this machine
 
@@ -15,7 +14,6 @@ Cap is an easy Linux box on HackTheBox. It looks simple on the surface — a web
 
 This box taught me that.
 
----
 
 ## Target
 
@@ -24,7 +22,6 @@ IP:  10.129.21.34
 OS:  Ubuntu Linux
 ```
 
----
 
 ## Step 1 — Nmap Scan
 
@@ -44,7 +41,6 @@ FTP was open. Noted it but needed creds first. Started with the web app.
 
 ![Nmap Results](/writeups/Cap/nmap.png)
 
----
 
 ## Step 2 — Web App and IDOR
 
@@ -68,7 +64,6 @@ Downloaded the pcap at `/data/0` and opened it in Wireshark.
 
 ![IDOR on data parameter](/writeups/Cap/idor.png)
 
----
 
 ## Step 3 — Wireshark Analysis
 
@@ -78,7 +73,6 @@ Got credentials for FTP.
 
 ![FTP creds in Wireshark](/writeups/Cap/user%20cred%20found%20in%20pcap0.png)
 
----
 
 ## Step 4 — FTP and User Flag
 
@@ -100,7 +94,6 @@ ssh nathan@10.129.21.34
 
 ![FTP login and user flag](/writeups/Cap/login%20with%20ftp%20and%20found%20user%20flag.png)
 
----
 
 ## Step 5 — Privesc Enumeration
 
@@ -132,7 +125,6 @@ That first line was the box. I didn't understand it at the time and almost scrol
 
 ![Linpeas capabilities finding](/writeups/Cap/run%20linpeas%20to%20look%20for%20privesc.png)
 
----
 
 ## Step 6 — Understanding Linux Capabilities
 
@@ -148,7 +140,6 @@ getcap -r / 2>/dev/null
 
 This is what I should have run as part of my standard enumeration checklist. It's separate from the SUID find command and would have shown me this immediately.
 
----
 
 ## Step 7 — Exploiting cap_setuid on Python
 
@@ -186,7 +177,6 @@ Done.
 
 ![Root shell via python cap_setuid](/writeups/Cap/got%20root%20access%20by%20exploiting%20python%20who%20can%20create%20suid.png)
 
----
 
 ## The Full Chain
 
@@ -207,7 +197,6 @@ python3 → os.setuid(0) → os.system("sh") → root shell
 cat /root/root.txt
 ```
 
----
 
 ## What I learned from this one
 
@@ -223,6 +212,5 @@ cat /root/root.txt
 
 **Reading linpeas properly takes practice.** The capabilities section is easy to scroll past when you're overwhelmed by red. Learn the sections by name so you can jump straight to what matters: Files with capabilities, sudo -l output, writable files, cron jobs.
 
----
 
 _Stager — FashilHack — Simulating Attacks, Securing Businesses._

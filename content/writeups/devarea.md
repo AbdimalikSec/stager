@@ -7,7 +7,6 @@ tags: ["linux", "hackthebox", "writeup", "xxe", "cve", "privilege-escalation"]
 
 **By Stager** | FashilHack
 
----
 
 ## What is this machine
 
@@ -15,7 +14,6 @@ Devarea is a medium Linux box on HackTheBox. It chains together a lot of moving 
 
 The box taught me that enumeration doesn't stop at port 80. Services on non-standard ports matter just as much, and sometimes the real entry point is hidden inside a JAR file sitting on an FTP server.
 
----
 
 ## Target
 
@@ -25,7 +23,6 @@ Domain: devarea.htb
 OS:  Linux (Ubuntu)
 ```
 
----
 
 ## Step 1 — Nmap Scan
 
@@ -55,7 +52,6 @@ Port 21 was the real start.
 
 ![Nmap Results](/writeups/devarea/nmap.png)
 
----
 
 ## Step 2 — Anonymous FTP → employee-service.jar
 
@@ -73,7 +69,6 @@ ftp> get employee-service.jar
 
 ![FTP File](/writeups/devarea/jar%20file%20found.png)
 
----
 
 ## Step 3 — JAR Decompilation → SOAP Endpoint Discovery
 
@@ -112,7 +107,6 @@ javap -c htb/devarea/Report.class
 
 ![JAR Decompiled](/writeups/devarea/soap%20api%20enumaration.png)
 
----
 
 ## Step 4 — SOAP Interaction → Confirm Input Reflection
 
@@ -153,7 +147,6 @@ User input going into a SOAP XML parser — classic XXE territory.
 
 ![SOAP Response](/writeups/devarea/soap%20api%20enumaration.png)
 
----
 
 ## Step 5 — XXE via SOAP → File Read → HoverFly Credentials
 
@@ -196,7 +189,6 @@ Credentials: `admin:O7IJ27MyyXiU`
 ![XXE File Read](/writeups/devarea/creates%20soap%20paylaod%20request%20that%20tries%20to%20read%20local%20files%20from%20the%20server%20and%20got%20base64.png)
 ![Decoded Creds](/writeups/devarea/got%20creds%20after%20decoding.png)
 
----
 
 ## Step 6 — HoverFly CVE-2025-54123 → Shell as dev_ryan
 
@@ -232,7 +224,6 @@ cat /home/dev_ryan/user.txt
 
 ![Shell as dev_ryan](/writeups/devarea/found%20shell.png)
 
----
 
 ## Step 7 — Privilege Escalation: Binary Hijacking → root
 
@@ -326,7 +317,6 @@ cat /root/root.txt
 ![Root Shell](/writeups/devarea/i%20got%20root%20forwarded%20as%20reverse%20shell.png)
 ![Root Flag](/writeups/devarea/flag.png)
 
----
 
 ## The Full Chain
 
@@ -358,7 +348,6 @@ Reverse shell as root
 root.txt
 ```
 
----
 
 ## What I learned from this one
 
@@ -374,6 +363,5 @@ root.txt
 
 **World-writable system binaries in a root execution chain is full compromise.** One writable binary is enough. That's why file permissions matter so much in hardening.
 
----
 
 _Stager — FashilHack — Simulating Attacks, Securing Businesses._" make it 

